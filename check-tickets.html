@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check Swag Bucks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f2f, #1c1c3b);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .checker-container {
+      background: rgba(34, 34, 52, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px 40px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 45px rgba(102, 126, 234, 0.3);
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #cfcff2;
+      margin-bottom: 25px;
+    }
+    select {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 10px;
+      background: #1a1a2e;
+      border: 2px solid #444466;
+      color: #ddddee;
+      margin-bottom: 20px;
+    }
+    #ticketDisplay {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #66ffcc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="checker-container">
+    <h1>🎟️ Swag Bucks Checker</h1>
+    <select id="userSelect" onchange="showTicketCount()">
+      <option disabled selected>Select Your Name</option>
+    </select>
+    <div id="ticketDisplay">Total Tickets: —</div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_2SKYsuYwEO3l8ikF2A9Qgnwr3XVuF2A",
+      authDomain: "dbk6-swagbucks.firebaseapp.com",
+      databaseURL: "https://dbk6-swagbucks-default-rtdb.firebaseio.com",
+      projectId: "dbk6-swagbucks",
+      storageBucket: "dbk6-swagbucks.appspot.com",
+      messagingSenderId: "820863016470",
+      appId: "1:820863016470:web:f28da08d7e9c8c33615f37"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const userSelect = document.getElementById("userSelect");
+    const ticketDisplay = document.getElementById("ticketDisplay");
+    let users = {};
+
+    // Load users from Firebase
+    database.ref('users').on('value', (snapshot) => {
+      users = snapshot.val() || {};
+      updateUserDropdown();
+    });
+
+    function updateUserDropdown() {
+      userSelect.innerHTML = '<option disabled selected>Select Your Name</option>';
+      Object.keys(users).sort().forEach(username => {
+        const option = document.createElement("option");
+        option.value = username;
+        option.textContent = username;
+        userSelect.appendChild(option);
+      });
+    }
+
+    function showTicketCount() {
+      const selectedUser = userSelect.value;
+      if (users[selectedUser]) {
+        const tickets = users[selectedUser].tickets || 0;
+        ticketDisplay.textContent = `Total Tickets: ${tickets}`;
+      } else {
+        ticketDisplay.textContent = "Total Tickets: —";
+      }
+    }
+  </script>
+</body>
+</html>
